@@ -1,0 +1,53 @@
+FROM apache/airflow:2.7.1
+
+USER root
+
+# Install OpenJDK and required dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    openjdk-11-jdk \
+    procps \
+    curl \
+    wget \
+    redis-tools \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set JAVA_HOME and add to PATH
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Install Apache Spark
+ENV SPARK_VERSION=3.4.1
+ENV HADOOP_VERSION=3
+ENV SPARK_HOME=/opt/spark
+ENV PATH="${SPARK_HOME}/bin:${PATH}"
+ENV PYTHONPATH="${SPARK_HOME}/python:${PYTHONPATH}"
+
+RUN wget -q "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" \
+    && tar xzf "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" \
+    && mv "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}" "${SPARK_HOME}" \
+    && rm "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
+
+# Create directory for Spark logs and set permissions
+RUN mkdir -p /opt/airflow/spark-logs && \
+    chown -R airflow:root /opt/airflow/spark-logs && \
+    chmod -R 777 /opt/airflow/spark-logs
+
+USER airflow
+
+# Install PySpark and dependencies
+RUN pip install --no-cache-dir \
+    pyspark==${SPARK_VERSION} \
+    delta-spark==2.4.0 \
+    findspark \
+    redis \
+    flask-limiter[redis]
+
+# Create necessary directories with correct permissions
+USER root
+RUN mkdir -p /opt/airflow/src/processing && \
+    chown -R airflow:root /opt/airflow && \
+    chmod -R 777 /opt/airflow
+
+USER airflow 
