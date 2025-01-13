@@ -11,6 +11,20 @@ A robust, scalable data pipeline for real-time collection, processing, and analy
   <img src="docs/images/pipeline_architecture.png" alt="Pipeline Architecture" width="800"/>
 </p>
 
+## 📋 Table of Contents
+- [Features](#-features)
+- [Architecture](#️-architecture)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Data Flow](#-data-flow)
+- [Configuration](#️-configuration)
+- [Monitoring](#-monitoring)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
+
 ## 🚀 Features
 
 - **Real-time Data Collection**: Automated fetching of stock market data from Alpha Vantage API
@@ -35,9 +49,12 @@ src/
 │   ├── data_processor.py      # Data transformation
 │   └── test_processor.py      # Unit tests
 ├── storage/           # Database operations
-│   └── db_operations.py       # Database handling
+│   ├── database.py           # Database connection handling
+│   ├── models.py            # Database models
+│   └── init_db.py          # Database initialization
 └── utils/            # Shared utilities
-    └── logging_config.py      # Logging setup
+    ├── logging_config.py    # Logging configuration
+    └── validation.py       # Data validation utilities
 
 airflow/              # Airflow configuration
 ├── dags/
@@ -62,3 +79,168 @@ cd real-time-financial-market-data-pipeline
 ```
 
 2. **Set up Python environment:**
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+```
+
+3. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Configure environment variables:**
+```bash
+cp .env.example .env
+# Edit .env with your configurations
+```
+
+5. **Start services:**
+```bash
+docker-compose up -d
+```
+
+## 🚀 Usage
+
+1. **Access Airflow UI:**
+   - Navigate to http://localhost:8081
+   - Login with:
+     - Username: `airflow`
+     - Password: `airflow`
+
+2. **Start the Pipeline:**
+   - Enable the DAG 'market_data_pipeline'
+   - Trigger manually or wait for scheduled execution
+   - DAG runs every 30 minutes by default
+
+3. **Monitor Operations:**
+   - View task status in Airflow UI
+   - Check logs in `airflow/logs/`
+   - Query results in PostgreSQL
+
+## 📊 Data Flow
+
+1. **Data Collection** 📥
+   - Real-time stock data from Alpha Vantage
+   - Supported symbols: AAPL, MSFT, IBM
+   - 5-minute interval data points
+   - Automatic rate limiting
+   - Handles API throttling and retries
+
+2. **Data Storage** 💾
+   - Raw data table: `stock_prices`
+     ```sql
+     - timestamp: TIMESTAMP
+     - symbol: VARCHAR
+     - open_price: DECIMAL
+     - high_price: DECIMAL
+     - low_price: DECIMAL
+     - close_price: DECIMAL
+     - volume: INTEGER
+     ```
+   - Processed data table: `stock_analysis`
+     ```sql
+     - window_start: TIMESTAMP
+     - window_end: TIMESTAMP
+     - symbol: VARCHAR
+     - avg_price: DECIMAL
+     - volume: INTEGER
+     - num_trades: INTEGER
+     ```
+
+3. **Data Processing** ⚙️
+   - 5-minute window aggregations
+   - Volume-weighted average price (VWAP)
+   - Moving averages calculation
+   - Data validation and cleaning
+   - Automatic error handling
+
+## ⚙️ Configuration
+
+Configure the pipeline through `.env` file:
+
+```ini
+# API Configuration
+ALPHA_VANTAGE_API_KEY=your_api_key
+API_CALL_INTERVAL=60
+
+# Database Configuration
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=financial_data
+DB_USER=postgres
+DB_PASSWORD=your_password
+
+# Airflow Configuration
+AIRFLOW_UID=50000
+AIRFLOW_PORT=8081
+```
+
+## 📈 Monitoring
+
+1. **Airflow Monitoring:**
+   - Task success/failure rates
+   - Task duration metrics
+   - DAG run history
+   - Real-time task status
+
+2. **Database Monitoring:**
+   - Data ingestion rates
+   - Storage utilization
+   - Query performance
+   - Connection pool status
+
+3. **Application Logs:**
+   - Detailed logging for all components
+   - Error tracking and alerting
+   - Performance metrics
+   - Data quality checks
+
+## 🔧 Troubleshooting
+
+Common issues and solutions:
+
+1. **Database Connection Issues:**
+   - Verify PostgreSQL service is running
+   - Check database credentials in `.env`
+   - Ensure proper network connectivity
+
+2. **API Rate Limiting:**
+   - Monitor Alpha Vantage API usage
+   - Adjust `API_CALL_INTERVAL` if needed
+   - Check API key validity
+
+3. **Airflow Task Failures:**
+   - Check task logs in Airflow UI
+   - Verify environment variables
+   - Monitor resource utilization
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Alpha Vantage](https://www.alphavantage.co/) for providing the financial data API
+- [Apache Airflow](https://airflow.apache.org/) for workflow orchestration
+- [Docker](https://www.docker.com/) for containerization
+- [PostgreSQL](https://www.postgresql.org/) for data storage
+- [Pandas](https://pandas.pydata.org/) for data processing
+
+## 📧 Contact
+
+Sechaba Mohlabeng
+
+Project Link: [https://github.com/xsechaba/real-time-financial-market-data-pipeline](https://github.com/xsechaba/real-time-financial-market-data-pipeline)
