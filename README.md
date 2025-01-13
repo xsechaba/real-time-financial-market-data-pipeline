@@ -28,7 +28,7 @@ A robust, scalable data pipeline for real-time collection, processing, and analy
 ## 🚀 Features
 
 - **Real-time Data Collection**: Automated fetching of stock market data from Alpha Vantage API
-- **Robust Data Storage**: PostgreSQL database for reliable data persistence
+- **Direct Database Integration**: Immediate PostgreSQL storage for reliable data persistence
 - **Efficient Processing**: Pandas-based data analysis with 5-minute window aggregations
 - **Automated Orchestration**: Apache Airflow DAGs for reliable pipeline scheduling
 - **Containerized Setup**: Docker-based deployment for consistency across environments
@@ -61,6 +61,13 @@ airflow/              # Airflow configuration
 │   └── market_data_pipeline.py # Pipeline DAG
 └── logs/             # Airflow logs
 ```
+
+The pipeline consists of three main components:
+1. **Data Collection**: Python scripts fetch data from Alpha Vantage API
+2. **Data Storage**: Direct PostgreSQL integration for storing raw and processed data
+3. **Data Processing**: Pandas-based analysis for calculating metrics and aggregations
+
+All components are orchestrated by Apache Airflow, ensuring reliable scheduling and monitoring.
 
 ## 🔧 Prerequisites
 
