@@ -8,7 +8,7 @@
 A robust, scalable data pipeline for real-time collection, processing, and analysis of financial market data from Alpha Vantage API. Built with modern data engineering practices and containerized for easy deployment.
 
 <p align="center">
-  <img src="docs/images/pipeline_architecture.png" alt="Pipeline Architecture" width="800"/>
+  <img src="docs/images/real-time-financial-market-data-pipeline.jpg" alt="Pipeline Architecture" width="800"/>
 </p>
 
 ## 📋 Table of Contents
